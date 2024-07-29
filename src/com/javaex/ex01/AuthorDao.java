@@ -1,3 +1,4 @@
+
 package com.javaex.ex01;
 
 import java.sql.Connection;
@@ -8,70 +9,42 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AuthorDao { // 기능 위주의 클래스
+public class AuthorDao {
 
 	// 필드
-	private Connection conn = null;
-	private PreparedStatement pstmt = null;
-	private ResultSet rs = null;
-
-	private String driver = "com.mysql.cj.jdbc.Driver";
-	private String url = "jdbc:mysql://localhost:3306/book_db";
-	private String id = "book";
-	private String pw = "1234";
 
 	// 생성자
 
 	// 메소드 gs
-	private void getConnection() {
-
-		try {
-			// 1. JDBC 드라이버 (Oracle) 로딩
-			Class.forName(driver);
-			// 2. Connection 얻어오기
-			conn = DriverManager.getConnection(url, id, pw);
-		} catch (ClassNotFoundException e) {
-			System.out.println("error: 드라이버 로딩 실패 - " + e);
-		} catch (SQLException e) {
-			System.out.println("error:" + e);
-		}
-	}
 
 	// 메소드 일반
-	// 자원 정리 메소드
-	private void close() {
-		// 5. 자원정리 메소드
-		try {
-			if (rs != null) {
-				rs.close();
-			}
-			if (pstmt != null) {
-				pstmt.close();
-			}
-			if (conn != null) {
-				conn.close();
-			}
-		} catch (SQLException e) {
-			System.out.println("error:" + e);
-		}
-	}
 
-	// 작가 등록
+	// 작가등록
 	public int insertAuthor(String name, String desc) {
-		System.out.println("등록 로직");
+		System.out.println(name);
+		System.out.println(desc);
+		System.out.println("저장 로직");
 
 		int count = -1;
 
 		// 0. import java.sql.*;
-		this.getConnection();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 
 		try {
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+			// 2. Connection 얻어오기
+			String url = "jdbc:mysql://localhost:3306/book_db";
+			conn = DriverManager.getConnection(url, "book", "book");
+
 			// 3. SQL문 준비 / 바인딩 / 실행
-			// *sql문 준비(insert 문을 자바의 문자열로 만든다.)
-			// String query = "insert into author value(null, '이말년','웹툰작가')";
+			// *sql문 준비
 			String query = "";
 			query += " insert into author ";
-			query += " value(null, ?, ?) ";
+			query += " values(null, ?, ?) ";
 
 			// *바인딩
 			pstmt = conn.prepareStatement(query);
@@ -82,187 +55,306 @@ public class AuthorDao { // 기능 위주의 클래스
 			count = pstmt.executeUpdate();
 
 			// 4.결과처리
-			System.out.println(count + " 건 등록되었습니다.");
+			System.out.println(count + "건 등록되었습니다.");
 
+		} catch (ClassNotFoundException e) {
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
+		} finally {
+
+			// 5. 자원정리
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				System.out.println("error:" + e);
+			}
+
 		}
-		// 자원 정리 메소드 호출
-		this.close();
 
 		return count;
-	}// 작가 등록
+	}// 작가등록
 
-	// 작가 삭제
-	public int deleteAuthor(int authorId) {
-		System.out.println("삭제 로직");
+	// 작가삭제
+	public int deleteAuthor(int id) {
+		System.out.println("작가삭제");
+		System.out.println(id);
 
 		int count = -1;
 
 		// 0. import java.sql.*;
-		this.getConnection();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 
 		try {
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+			// 2. Connection 얻어오기
+			String url = "jdbc:mysql://localhost:3306/book_db";
+			conn = DriverManager.getConnection(url, "book", "book");
+
 			// 3. SQL문 준비 / 바인딩 / 실행
 			// *sql문 준비
 			String query = "";
 			query += " delete from author ";
 			query += " where author_id = ? ";
 
-			// *바인딩
-
+			// *바인딩 ?
 			pstmt = conn.prepareStatement(query);
-			pstmt.setInt(1, authorId);
+			pstmt.setInt(1, id);
 
 			// *실행
 			count = pstmt.executeUpdate();
 
 			// 4.결과처리
-			System.out.println(count + " 건 처리 완료");
+			System.out.println(count + "건 삭제되었습니다.");
 
+		} catch (ClassNotFoundException e) {
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
+		} finally {
+
+			// 5. 자원정리
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				System.out.println("error:" + e);
+			}
+
 		}
 
-		// 자원 정리 메소드 호출
-		this.close();
-
 		return count;
-	}// 작가 삭제
+	}// 작가삭제
 
-	// 작가 업데이트
-	public int updateAuthor(int authorId, String name, String desc) {
+	
+	
+	// 작가수정
+	public int updateAuthor(int id, String name, String desc) {
 		System.out.println("수정 로직");
 
 		int count = -1;
 
 		// 0. import java.sql.*;
-		this.getConnection();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 
 		try {
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+			// 2. Connection 얻어오기
+			String url = "jdbc:mysql://localhost:3306/book_db";
+			conn = DriverManager.getConnection(url, "book", "book");
+
 			// 3. SQL문 준비 / 바인딩 / 실행
 			// *sql문 준비
 			String query = "";
 			query += " update author ";
-			query += " set author_name = ? , ";
-			query += " author_desc	= ? ";
+			query += " set author_name = ?, ";
+			query += "     author_desc = ? ";
 			query += " where author_id = ? ";
 
 			// *바인딩
 			pstmt = conn.prepareStatement(query);
 			pstmt.setString(1, name);
 			pstmt.setString(2, desc);
-			pstmt.setInt(3, authorId);
+			pstmt.setInt(3, id);
 
 			// *실행
 			count = pstmt.executeUpdate();
-//			rs = pstmt.executeQuery();
 
 			// 4.결과처리
-			System.out.println(count + " 건 등록되었습니다.");
+			System.out.println(count + "건 수정되었습니다.");
 
+		} catch (ClassNotFoundException e) {
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
-		}
-		// 자원 정리 메소드 호출
-		this.close();
+		} finally {
 
-		return count;
-	}// 작가 업데이트
+			// 5. 자원정리
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				System.out.println("error:" + e);
+			}
 
-	// 작가 정보 하나 가져오기
-	public int selectAuthor(int authorId) {
-		System.out.println("선택한 작가 정보");
-
-		int count = -1;
-		// 0. import java.sql.*;
-		this.getConnection();
-
-		try {
-			// 3. SQL문 준비 / 바인딩 / 실행
-			// *sql문 준비
-			String query = "";
-			query += " select author_id ";
-			query += " 		 ,author_name ";
-			query += "		 ,author_desc ";
-			query += " from author ";
-			query += " where author_id = ? ";
-
-			// *바인딩
-			pstmt = conn.prepareStatement(query);
-			pstmt.setInt(1, authorId);
-
-			// *실행 - executeUpdate 하고 헷갈릴 수 있다.
-			rs = pstmt.executeQuery();
-
-			// 4.결과처리
-			rs.next(); // 커서를 옮겨서 필드명 밑의 데이터를 가리키게 해야함
-			int aid = rs.getInt("author_id");
-			String name = rs.getString("author_name");
-			String desc = rs.getString("author_desc");
-			AuthorVo authorVo = new AuthorVo(aid, name, desc);
-			System.out.println(authorVo);
-
-		} catch (SQLException e) {
-			System.out.println("error:" + e);
 		}
 
-		// 자원 정리 메소드 호출
-		this.close();
-
 		return count;
-
-	}// 작가 정보 하나 가져오기 끝.
-
-	// 작가 정보 다 가져오기
+	}// 작가수정
+	
+	
+	
+	// 작가전체리스트
 	public List<AuthorVo> selectAuthorAll() {
 		System.out.println("작가전체리스트");
-		// 리스트만들기
+
 		List<AuthorVo> authorList = new ArrayList<AuthorVo>();
 
 		// 0. import java.sql.*;
-		this.getConnection();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 
 		try {
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+			// 2. Connection 얻어오기
+			String url = "jdbc:mysql://localhost:3306/book_db";
+			conn = DriverManager.getConnection(url, "book", "book");
+
 			// 3. SQL문 준비 / 바인딩 / 실행
 			// *sql문 준비
 			String query = "";
-			query += " select author_id ";
-			query += " 		 ,author_name ";
-			query += "		 ,author_desc ";
+			query += " select 	author_id, ";
+			query += "		    author_name, ";
+			query += "          author_desc ";
 			query += " from author ";
 			query += " order by author_id asc ";
 
 			// *바인딩
 			pstmt = conn.prepareStatement(query);
 
-			// *실행 - executeUpdate 하고 헷갈릴 수 있다.
+			// *실행
 			rs = pstmt.executeQuery();
 
 			// 4.결과처리
-			// 리스트로 만들기 - while 반복문 이용해서 전부 출력
-			// authroVo 작가수만큼 만들기
+			// 리스트로 만들기
 			while (rs.next()) {
-				int aid = rs.getInt("author_id");
+				int id = rs.getInt("author_id");
 				String name = rs.getString("author_name");
 				String desc = rs.getString("author_desc");
 
-				// 리스트 리턴
-				AuthorVo authorVo = new AuthorVo(aid, name, desc);
-				// 위에 만든 것을 add
+				AuthorVo authorVo = new AuthorVo(id, name, desc);
 				authorList.add(authorVo);
 			}
 
+		} catch (ClassNotFoundException e) {
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
+		} finally {
+
+			// 5. 자원정리
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				System.out.println("error:" + e);
+			}
+
 		}
 
-		// 자원 정리 메소드 호출
-		this.close();
+		return authorList; // 리스트의 *주소를 리턴해준다
 
-		// 리스트의 주소를 리턴해준다.
-		return authorList;
+	}// 작가전체리스트
 
-	}
+	// 작가한명
+	public AuthorVo selectAuthor(int id) {
+		System.out.println("작가한명");
 
+		AuthorVo authorVo = null;
+		
+		// 0. import java.sql.*;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+			// 2. Connection 얻어오기
+			String url = "jdbc:mysql://localhost:3306/book_db";
+			conn = DriverManager.getConnection(url, "book", "book");
+
+			// 3. SQL문 준비 / 바인딩 / 실행
+			// *sql문 준비
+			String query = "";
+			query += " select 	author_id, ";
+			query += "		    author_name, ";
+			query += "          author_desc ";
+			query += " from author ";
+			query += " where author_id = ? ";
+
+			// *바인딩
+			pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, id);
+
+			// *실행
+			rs = pstmt.executeQuery();
+
+			// 4.결과처리
+			// 리스트로 만들기
+			while (rs.next()) {
+				int authorId = rs.getInt("author_id");
+				String name = rs.getString("author_name");
+				String desc = rs.getString("author_desc");
+
+				authorVo = new AuthorVo(authorId, name, desc);
+			}
+
+		} catch (ClassNotFoundException e) {
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
+		} catch (SQLException e) {
+			System.out.println("error:" + e);
+		} finally {
+
+			// 5. 자원정리
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				System.out.println("error:" + e);
+			}
+
+		}
+
+		return authorVo; // 리스트의 *주소를 리턴해준다
+
+	}// 작가한명
 }
